@@ -1,5 +1,5 @@
 # Adds namespace to all resources.
-namespace: dt-extensions-operator-system
+namespace: dt-extensions
 
 # Value of this field is prepended to the
 # names of all resources, e.g. a deployment named

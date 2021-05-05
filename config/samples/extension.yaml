@@ -2,8 +2,10 @@ apiVersion: dynatrace.com/v1alpha1
 kind: Extension
 metadata:
   name: extension-sample
+  namespace: dt-extensions
 spec:
   # Add fields here
   extensionLinks:
     - https://dynatrace.com
     - https://google.com
+    - https://g1.com.br
