@@ -1,0 +1,7 @@
+apiVersion: dynatrace.com/v1alpha1
+kind: Extension
+metadata:
+  name: extension-sample
+spec:
+  # Add fields here
+  foo: bar
