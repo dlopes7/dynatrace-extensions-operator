@@ -4,4 +4,6 @@ metadata:
   name: extension-sample
 spec:
   # Add fields here
-  foo: bar
+  extensionLinks:
+    - https://dynatrace.com
+    - https://google.com

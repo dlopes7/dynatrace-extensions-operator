@@ -18,13 +18,16 @@ package controllers
 
 import (
 	"context"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/go-logr/logr"
+	appsv1 "k8s.io/api/apps/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	dynatracecomv1alpha1 "quay.io/dlopes7/dt-extensions-operator/api/v1alpha1"
+	dynatracev1alpha1 "quay.io/dlopes7/dt-extensions-operator/api/v1alpha1"
 )
 
 // ExtensionReconciler reconciles a Extension object
@@ -37,20 +40,28 @@ type ExtensionReconciler struct {
 //+kubebuilder:rbac:groups=dynatrace.com,resources=extensions,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=dynatrace.com,resources=extensions/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=dynatrace.com,resources=extensions/finalizers,verbs=update
+//+kubebuilder:rbac:groups=apps,resources=daemonsets,verbs=get;list;watch;create;update;patch;delete
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the Extension object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.2/pkg/reconcile
+// Reconcile makes sure that the extensions are deployed for nodes where the OneAgent is running
 func (r *ExtensionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = r.Log.WithValues("extension", req.NamespacedName)
 
-	// your logic here
+	r.Log.Info("Reconciling extensions")
+
+	instance := &dynatracev1alpha1.Extension{}
+	err := r.Client.Get(ctx, req.NamespacedName, instance)
+	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			// Request object not found, could have been deleted after reconcile request.
+			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+			// Return and don't requeue
+			return reconcile.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		return reconcile.Result{}, err
+	}
+
+	r.Log.Info("Found instance", "instance", instance)
 
 	return ctrl.Result{}, nil
 }
@@ -58,6 +69,7 @@ func (r *ExtensionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 // SetupWithManager sets up the controller with the Manager.
 func (r *ExtensionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&dynatracecomv1alpha1.Extension{}).
+		For(&dynatracev1alpha1.Extension{}).
+		Owns(&appsv1.DaemonSet{}).
 		Complete(r)
 }
