@@ -4,7 +4,7 @@ This is Kubernetes operator that can deploy [Dynatrace OneAgent extensions](http
 
 This is specially useful when you have a lot of nodes, or does not have access to the underlying host (GKE for instance)
 
-> :warning: **Not supported**: This project is not supported by Dynatrace, it is a personal project, use at your own risk.
+> :warning: **Not supported**: This project is not supported by Dynatrace, it is a personal project, use at your own risk. :warning: 
 
 # Installation
 
