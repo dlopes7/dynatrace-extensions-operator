@@ -1,7 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dt-extensions
+---
 apiVersion: dynatrace.com/v1alpha1
 kind: Extension
 metadata:
-  name: extension-sample
+  name: extensions-sample
   namespace: dt-extensions
 spec:
   extensions:
