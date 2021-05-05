@@ -1,0 +1,74 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: extensions.dynatrace.com
+spec:
+  group: dynatrace.com
+  names:
+    kind: Extension
+    listKind: ExtensionList
+    plural: extensions
+    singular: extension
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Extension is the Schema for the extensions API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ExtensionsSpec defines the desired state of Extension
+            properties:
+              extensions:
+                description: ExtensionLinks is a list of extensions that should be
+                  installed
+                items:
+                  properties:
+                    downloadLink:
+                      type: string
+                    name:
+                      type: string
+                  type: object
+                type: array
+            type: object
+          status:
+            description: ExtensionStatus defines the observed state of Extension
+            properties:
+              instances:
+                additionalProperties:
+                  properties:
+                    ipAddress:
+                      type: string
+                    podName:
+                      type: string
+                  type: object
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

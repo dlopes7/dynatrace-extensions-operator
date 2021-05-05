@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"hash/fnv"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -107,23 +108,31 @@ func hasDaemonSetChanged(a, b *appsv1.DaemonSet) bool {
 	return getTemplateHash(a) != getTemplateHash(b)
 }
 
-func newPodSpec() corev1.PodSpec {
+func prepareEnvs(extensionSpec dynatracev1alpha1.ExtensionSpec) []corev1.EnvVar {
+	var envs []corev1.EnvVar
 
-	p := corev1.PodSpec{
-		Volumes: []corev1.Volume{
-			{
-				Name: "host-root",
-				VolumeSource: corev1.VolumeSource{
-					HostPath: &corev1.HostPathVolumeSource{
-						Path: "/",
-					},
-				},
-			},
-		},
-		Containers: []corev1.Container{{
+	envs = append(envs, corev1.EnvVar{
+		Name:  "DT_EXTENSION_LINK",
+		Value: extensionSpec.DownloadLink,
+	},
+		corev1.EnvVar{
+			Name:  "DT_EXTENSION_NAME",
+			Value: extensionSpec.Name,
+		})
+
+	return envs
+}
+
+func prepareContainers(instance *dynatracev1alpha1.Extension) []corev1.Container {
+
+	var containers []corev1.Container
+	for _, extensionSpec := range instance.Spec.Extensions {
+
+		containers = append(containers, corev1.Container{
+			Env:             prepareEnvs(extensionSpec),
 			Image:           "quay.io/dlopes7/dt-extension:latest",
 			ImagePullPolicy: corev1.PullAlways,
-			Name:            "dt-extension",
+			Name:            fmt.Sprintf("dt-extension-%s", extensionSpec.Name),
 			ReadinessProbe: &corev1.Probe{
 				Handler: corev1.Handler{
 					Exec: &corev1.ExecAction{
@@ -136,14 +145,33 @@ func newPodSpec() corev1.PodSpec {
 				PeriodSeconds:       30,
 				TimeoutSeconds:      1,
 			},
-			// SecurityContext: secCtx,
 			VolumeMounts: []corev1.VolumeMount{
 				{
 					Name:      "host-root",
 					MountPath: "/mnt/root",
 				},
-			}},
+			}})
+
+	}
+
+	return containers
+
+}
+
+func newPodSpec(instance *dynatracev1alpha1.Extension) corev1.PodSpec {
+
+	p := corev1.PodSpec{
+		Volumes: []corev1.Volume{
+			{
+				Name: "host-root",
+				VolumeSource: corev1.VolumeSource{
+					HostPath: &corev1.HostPathVolumeSource{
+						Path: "/",
+					},
+				},
+			},
 		},
+		Containers: prepareContainers(instance),
 	}
 
 	return p
@@ -151,7 +179,7 @@ func newPodSpec() corev1.PodSpec {
 
 func newDaemonSet(instance *dynatracev1alpha1.Extension) (*appsv1.DaemonSet, error) {
 
-	podSpec := newPodSpec()
+	podSpec := newPodSpec(instance)
 
 	selectorLabels := buildLabels(instance.GetName())
 	ds := &appsv1.DaemonSet{

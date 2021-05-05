@@ -23,11 +23,16 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// ExtensionSpec defines the desired state of Extension
-type ExtensionSpec struct {
+// ExtensionsSpec defines the desired state of Extension
+type ExtensionsSpec struct {
 
 	// ExtensionLinks is a list of extensions that should be installed
-	ExtensionLinks []string `json:"extensionLinks,omitempty"`
+	Extensions []ExtensionSpec `json:"extensions,omitempty"`
+}
+
+type ExtensionSpec struct {
+	Name         string `json:"name,omitempty"`
+	DownloadLink string `json:"downloadLink,omitempty"`
 }
 
 // ExtensionStatus defines the observed state of Extension
@@ -51,7 +56,7 @@ type Extension struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ExtensionSpec   `json:"spec,omitempty"`
+	Spec   ExtensionsSpec  `json:"spec,omitempty"`
 	Status ExtensionStatus `json:"status,omitempty"`
 }
 

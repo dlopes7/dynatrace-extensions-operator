@@ -4,8 +4,9 @@ metadata:
   name: extension-sample
   namespace: dt-extensions
 spec:
-  # Add fields here
-  extensionLinks:
-    - https://dynatrace.com
-    - https://google.com
-    - https://g1.com.br
+  extensions:
+    - name: rabbitmq
+      downloadLink: http://192.168.15.101:5656/custom.python.rabbitmq_kubernetes.zip
+    - name: redis
+      downloadLink: http://192.168.15.101:5656/custom.python.redis_kubernetes.zip
+
