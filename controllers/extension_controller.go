@@ -147,8 +147,8 @@ func prepareContainers(instance *dynatracev1alpha1.Extension) []corev1.Container
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{
-					Name:      "host-root",
-					MountPath: "/mnt/root",
+					Name:      "host-plugin-deployment",
+					MountPath: "/plugin_deployment",
 				},
 			}})
 
@@ -163,10 +163,11 @@ func newPodSpec(instance *dynatracev1alpha1.Extension) corev1.PodSpec {
 	p := corev1.PodSpec{
 		Volumes: []corev1.Volume{
 			{
-				Name: "host-root",
+				Name: "host-plugin-deployment",
 				VolumeSource: corev1.VolumeSource{
 					HostPath: &corev1.HostPathVolumeSource{
-						Path: "/",
+						// TODO - Maybe there is a way to not have this hardcoded
+						Path: "/opt/dynatrace/oneagent/plugin_deployment",
 					},
 				},
 			},
