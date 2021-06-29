@@ -11,7 +11,7 @@ This is specially useful when you have a lot of nodes, or does not have access t
 Install the operator with
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/dlopes7/dynatrace-extensions-operator/master/config/crd/bases/crd.yaml
+kubectl apply -f https://github.com/dlopes7/dynatrace-extensions-operator/releases/download/v0.0.1/crd.yaml
 ```
 
 You can obtain a sample extensions definition [here](https://github.com/dlopes7/dynatrace-extensions-operator/blob/master/config/samples/extensions.yaml):
